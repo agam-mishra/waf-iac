@@ -1,8 +1,10 @@
-import * as cdk from '@aws-cdk/core';
-import * as wafv2 from '@aws-cdk/aws-wafv2';
-import * as elbv2 from '@aws-cdk/aws-elasticloadbalancingv2';
-import * as cloudwatch from '@aws-cdk/aws-cloudwatch';
-import * as sns from '@aws-cdk/aws-sns'
+import * as cdk from 'aws-cdk-lib';
+import * as wafv2 from 'aws-cdk-lib/aws-wafv2';
+import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
+import * as sns from 'aws-cdk-lib/aws-sns'
+import { Construct } from 'constructs';
+
 
 export class WafIacStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
@@ -581,7 +583,7 @@ export class WafIacStack extends cdk.Stack {
 }
 
 export class WebACLAssociation extends wafv2.CfnWebACLAssociation {
-  constructor(scope: cdk.Construct, id: string, props: wafv2.CfnWebACLAssociationProps) {
+  constructor(scope: Construct, id: string, props: wafv2.CfnWebACLAssociationProps) {
       super(scope, id,{
           resourceArn: props.resourceArn,
           webAclArn: props.webAclArn,
