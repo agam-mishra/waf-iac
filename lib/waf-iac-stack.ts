@@ -11,7 +11,7 @@ export class WafIacStack extends cdk.Stack {
     super(scope, id, props);
 
     //get name load balancer ARN
-    const stageALB = elbv2.ApplicationLoadBalancer.fromLookup(this, 'devALB', {
+    const stageALB = elbv2.ApplicationLoadBalancer.fromLookup(this, 'ALB', {
       loadBalancerTags: {
         application: '',  //Name of ALB you want it to be attached to
       },
@@ -23,68 +23,68 @@ export class WafIacStack extends cdk.Stack {
     });
 
     //IPv4 IP set 
-    const ipV4IPSet = new wafv2.CfnIPSet(this, 'devIPv4IPSet', {
+    const ipV4IPSet = new wafv2.CfnIPSet(this, 'IPv4IPSet', {
       addresses: [],
       ipAddressVersion: 'IPV4',
       scope: 'REGIONAL',
-      description: 'This IP set will be used to list permanently blocked IPv4 IPs on dev.',
-      name: 'blocked-IPv4-ip-list-dev',
+      description: 'This IP set will be used to list permanently blocked IPv4 IPs.',
+      name: 'blocked-IPv4-ip-list',
       tags: [{
         key: 'ipset',
-        value: 'IPv4-dev',
+        value: 'IPv4',
       }],
     });
 
 
     //IPv6 IP set
-    const ipV6IPSet = new wafv2.CfnIPSet(this, 'devIPv6IPSet', {
+    const ipV6IPSet = new wafv2.CfnIPSet(this, 'IPv6IPSet', {
       addresses: [],
       ipAddressVersion: 'IPV6',
       scope: 'REGIONAL',
-      description: 'This IP set will be used to list permanently blocked IPv6 IPs on dev.',
-      name: 'blocked-IPv6-ip-list-dev',
+      description: 'This IP set will be used to list permanently blocked IPv6 IPs.',
+      name: 'blocked-IPv6-ip-list',
       tags: [{
         key: 'ipset',
-        value: 'IPv6-dev',
+        value: 'IPv6',
       }],
     });
 
 
     // Bot Regex pattern
-    const botRegexPatternSet = new wafv2.CfnRegexPatternSet(this, 'devBotRegexPatternSet', {
+    const botRegexPatternSet = new wafv2.CfnRegexPatternSet(this, 'BotRegexPatternSet', {
       regularExpressionList: [
         "^foobar$",
       ],
       scope: 'REGIONAL',
-      description: 'This regex rule is for requests which have bad User Agent on dev.',
-      name: 'bot-requests-dev',
+      description: 'This regex rule is for requests which have bad User Agent on.',
+      name: 'bot-requests',
       tags: [{
         key: 'regexPattern',
-        value: 'bot-requests-dev',
+        value: 'bot-requests',
       }],
     });
 
 
     // URL Regex pattern
-    const urlRegexPatternSet = new wafv2.CfnRegexPatternSet(this, 'devUrlRegexPatternSet', {
+    const urlRegexPatternSet = new wafv2.CfnRegexPatternSet(this, 'UrlRegexPatternSet', {
       regularExpressionList: ["^foobar$", "^example$"],
       scope: 'REGIONAL',
-      description: 'This regex group is to find false url requests on dev.',
-      name: 'url-path-dev',
+      description: 'This regex group is to find false url requests on.',
+      name: 'url-path',
       tags: [{
         key: 'regexPattern',
-        value: 'url-path-dev',
+        value: 'url-path',
       }],
     });
 
 
     //rule group for bad url
-    const badUrlRequestRG = new wafv2.CfnRuleGroup(this, 'badUrlRequestRG-dev', {
+    const badUrlRequestRG = new wafv2.CfnRuleGroup(this, 'badUrlRequestRG', {
       capacity: 100,
       scope: 'REGIONAL',
       visibilityConfig: {
         cloudWatchMetricsEnabled: true,
-        metricName: 'badUrlRequestRG-dev',
+        metricName: 'badUrlRequestRG',
         sampledRequestsEnabled: true,
       },
       customResponseBodies: {
@@ -93,10 +93,10 @@ export class WafIacStack extends cdk.Stack {
           contentType: 'TEXT_HTML',
         },
       },
-      description: 'This rule group will be used for requests with bad URL in dev.',
-      name: 'bad-url-request-rg-dev',
+      description: 'This rule group will be used for requests with bad URL in.',
+      name: 'bad-url-request-rg',
       rules: [{
-        name: 'url-rule-dev',
+        name: 'url-rule',
         priority: 0,
         statement: {
           regexPatternSetReferenceStatement: {
@@ -112,7 +112,7 @@ export class WafIacStack extends cdk.Stack {
         },
         visibilityConfig: {
           cloudWatchMetricsEnabled: true,
-          metricName: 'url-rule-dev',
+          metricName: 'url-rule',
           sampledRequestsEnabled: true,
         },
         action: {
@@ -129,7 +129,7 @@ export class WafIacStack extends cdk.Stack {
       }],
       tags: [{
         key: 'rule-group',
-        value: 'bad-url-request-rg-dev',
+        value: 'bad-url-request-rg',
       }],
     });
 
@@ -139,12 +139,12 @@ export class WafIacStack extends cdk.Stack {
     });
 
     //rule group for ip
-    const blockIpRG = new wafv2.CfnRuleGroup(this, 'blockIpRG-dev', {
+    const blockIpRG = new wafv2.CfnRuleGroup(this, 'blockIpRG', {
       capacity: 25,
       scope: 'REGIONAL',
       visibilityConfig: {
         cloudWatchMetricsEnabled: true,
-        metricName: 'blockIpRG-dev',
+        metricName: 'blockIpRG',
         sampledRequestsEnabled: true,
       },
       customResponseBodies: {
@@ -153,10 +153,10 @@ export class WafIacStack extends cdk.Stack {
           contentType: 'TEXT_HTML',
         },
       },
-      description: 'This rule group will be used to block malicious IPs on dev.',
-      name: 'block-ip-rg-dev',
+      description: 'This rule group will be used to block malicious IPs.',
+      name: 'block-ip-rg',
       rules: [{
-        name: 'blocked-ips-dev',
+        name: 'blocked-ips',
         priority: 0,
         statement:{
           orStatement: {
@@ -176,7 +176,7 @@ export class WafIacStack extends cdk.Stack {
         },
         visibilityConfig: {
           cloudWatchMetricsEnabled: true,
-          metricName: 'url-rule-dev',
+          metricName: 'url-rule',
           sampledRequestsEnabled: true,
         },
         action: {
@@ -193,7 +193,7 @@ export class WafIacStack extends cdk.Stack {
       }],
       tags: [{
         key: 'rule-group',
-        value: 'block-ip-rg-dev',
+        value: 'block-ip-rg',
       }],
     });
 
@@ -205,12 +205,12 @@ export class WafIacStack extends cdk.Stack {
 
 
     //rule group for blocking bots
-    const botRequestRG = new wafv2.CfnRuleGroup(this, 'botRequestRG-dev', {
+    const botRequestRG = new wafv2.CfnRuleGroup(this, 'botRequestRG', {
       capacity: 75,
       scope: 'REGIONAL',
       visibilityConfig: {
         cloudWatchMetricsEnabled: true,
-        metricName: 'botRequestRG-dev',
+        metricName: 'botRequestRG',
         sampledRequestsEnabled: true,
       },
       customResponseBodies: {
@@ -219,10 +219,10 @@ export class WafIacStack extends cdk.Stack {
           contentType: 'TEXT_HTML',
         },
       },
-      description: 'This rule group will be used to block bot requests in dev.',
-      name: 'bot-requests-rg-dev',
+      description: 'This rule group will be used to block bot requests.',
+      name: 'bot-requests-rg',
       rules: [{
-        name: 'block-bot-rule-dev',
+        name: 'block-bot-rule',
         priority: 0,
         statement: {
           regexPatternSetReferenceStatement: {
@@ -240,7 +240,7 @@ export class WafIacStack extends cdk.Stack {
         },
         visibilityConfig: {
           cloudWatchMetricsEnabled: true,
-          metricName: 'block-bot-rule-dev',
+          metricName: 'block-bot-rule',
           sampledRequestsEnabled: true,
         },
         action: {
@@ -257,7 +257,7 @@ export class WafIacStack extends cdk.Stack {
       }],
       tags: [{
         key: 'rule-group',
-        value: 'bot-requests-rg-dev',
+        value: 'bot-requests-rg',
       }],
     });
 
@@ -268,12 +268,12 @@ export class WafIacStack extends cdk.Stack {
 
 
     // rule group for blocking IPs based on rate limit
-    const limitIpRequestRG = new wafv2.CfnRuleGroup(this, 'limitIpRequestRG-dev', {
+    const limitIpRequestRG = new wafv2.CfnRuleGroup(this, 'limitIpRequestRG', {
       capacity: 50,
       scope: 'REGIONAL',
       visibilityConfig: {
         cloudWatchMetricsEnabled: true,
-        metricName: 'limitIpRequestRG-dev',
+        metricName: 'limitIpRequestRG',
         sampledRequestsEnabled: true,
       },
 
@@ -283,10 +283,10 @@ export class WafIacStack extends cdk.Stack {
           contentType: 'TEXT_HTML',
         },
       },
-      description: 'This rule group will be used to count and block requests from IP in dev.',
-      name: 'limit-ip-request-rg-dev',
+      description: 'This rule group will be used to count and block requests from IP.',
+      name: 'limit-ip-request-rg',
       rules: [{
-        name: 'block-ip-rule-dev',
+        name: 'block-ip-rule',
         priority: 0,
         statement: {
           rateBasedStatement: {
@@ -296,7 +296,7 @@ export class WafIacStack extends cdk.Stack {
         },
         visibilityConfig: {
           cloudWatchMetricsEnabled: true,
-          metricName: 'block-ip-rule-dev',
+          metricName: 'block-ip-rule',
           sampledRequestsEnabled: true,
         },
         action: {
@@ -313,7 +313,7 @@ export class WafIacStack extends cdk.Stack {
       }],
       tags: [{
         key: 'rule-group',
-        value: 'imit-ip-request-rg-dev',
+        value: 'imit-ip-request-rg',
       }],
     });
 
@@ -336,11 +336,11 @@ export class WafIacStack extends cdk.Stack {
       },
     
       description: 'description of webACL goes here.', // change description
-      name: 'dev-acl', //change name of ACL
+      name: 'demoAcl', //change name of ACL
       rules: [
         //limit IPs rule in ACL
         {
-          name: 'limit-ip-dev',
+          name: 'limit-ip',
           priority: 0,
           statement: { 
             ruleGroupReferenceStatement: {
@@ -352,7 +352,7 @@ export class WafIacStack extends cdk.Stack {
           },
           visibilityConfig: {
             cloudWatchMetricsEnabled: true,
-            metricName: 'limit-ip-dev',
+            metricName: 'limit-ip',
             sampledRequestsEnabled: true,
           },
         },
@@ -480,7 +480,7 @@ export class WafIacStack extends cdk.Stack {
       ],
       tags: [{
         key: 'webAcl',
-        value: 'dev',
+        value: 'waf',
       }],
     });
    
@@ -492,20 +492,23 @@ export class WafIacStack extends cdk.Stack {
     
 
     //create an object for associating webAcl to load balancer
-    new WebACLAssociation(this, 'DevAssociation',{
+    new WebACLAssociation(this, 'Association',{
       //resourceArn: stageALB.loadBalancerArn,
       resourceArn: stageALB.loadBalancerArn,
       webAclArn: webACL.attrArn
     });
     
     // get existing sns topic
-    const existingTopic = sns.Topic.fromTopicArn(this, 'Waf_alarm', "arn:aws:sns:us-east-1:453155843072:Waf_alarm");
-    console.log(existingTopic.topicArn)
+    //uncomment this only when you want to push notifications to existing SNS topic.
+    /** 
+      const existingTopic = sns.Topic.fromTopicArn(this, 'Waf_alarm', "arn:aws:sns:us-east-1:453155843072:Waf_alarm");
+      console.log(existingTopic.topicArn)
+    */
     
     // create new SNS topic
     const topic = new sns.Topic(this, 'Topic',{
-      displayName :'NCR Monitoring Dev',
-      topicName: 'ncr-monitoring-dev'
+      displayName :'WAF Monitoring',
+      topicName: 'waf-monitoring'
     });
 
     // get newly created topic's ARN
@@ -516,7 +519,7 @@ export class WafIacStack extends cdk.Stack {
 
 
     // create a new subscription and attach it to newly created SNS topic
-    new sns.Subscription(this, 'Subscription', {
+    new sns.Subscription(this, 'wafSubscription', {
       topic,
       endpoint: "abc@example.com", // email on which you want to be notified
       protocol: sns.SubscriptionProtocol.EMAIL,
@@ -528,7 +531,7 @@ export class WafIacStack extends cdk.Stack {
       evaluationPeriods: 1,
       actionsEnabled: true,
       alarmActions: [newTopicARN.value],
-      alarmDescription: 'This alarm will be triggered when counted requests are more than 500 in a minute in stage environment',
+      alarmDescription: 'This alarm will be triggered when counted requests are more than 500 in a minute.',
       alarmName: 'WAF Counted Requests Alarm Stack', // giving this alarm a name to be  ore generic because using stack gives a unique id which is confusing
       datapointsToAlarm: 1,
       dimensions: [{
@@ -557,7 +560,7 @@ export class WafIacStack extends cdk.Stack {
       evaluationPeriods: 1,
       actionsEnabled: true,
       alarmActions: [newTopicARN.value],
-      alarmDescription: 'This alarm will be triggered when counted requests are more than 500 in a minute in stage environment',
+      alarmDescription: 'This alarm will be triggered when counted requests are more than 500 in a minute.',
       alarmName: 'WAF Blocked Requests Alarm Stack', // giving this alarm a name to be  ore generic because using stack gives a unique id which is confusing
       datapointsToAlarm: 1,
       dimensions: [{
